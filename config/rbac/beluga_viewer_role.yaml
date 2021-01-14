@@ -1,0 +1,20 @@
+# permissions for end users to view belugas.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: beluga-viewer-role
+rules:
+- apiGroups:
+  - service.beluga.io
+  resources:
+  - belugas
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - service.beluga.io
+  resources:
+  - belugas/status
+  verbs:
+  - get

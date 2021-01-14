@@ -1,0 +1,7 @@
+domain: beluga.io
+repo: github.com/morningfish/beluga
+resources:
+- group: service
+  kind: Beluga
+  version: v1
+version: "2"

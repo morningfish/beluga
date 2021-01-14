@@ -1,0 +1,7 @@
+apiVersion: service.beluga.io/v1
+kind: Beluga
+metadata:
+  name: beluga-sample
+spec:
+  # Add fields here
+  foo: bar
