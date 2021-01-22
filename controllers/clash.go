@@ -15,7 +15,7 @@ func InitRule() error {
 		return err
 	}
 	if rules == nil {
-		for _, host := range BindHost {
+		for _, host := range config.BindHost {
 			config.Rules = append(config.Rules, fmt.Sprintf("DOMAIN-SUFFIX,%s,Proxy", host))
 		}
 		return nil
