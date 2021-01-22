@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+	"github.com/morningfish/beluga/api/config"
 	belugav1 "github.com/morningfish/beluga/api/v1"
 	"github.com/morningfish/beluga/tools"
 	"io/ioutil"
@@ -8,26 +10,27 @@ import (
 	"strings"
 )
 
-var (
-	BindHostFile string
-	BindHost     []string
-)
-
 func InitBindHost() error {
-	if tools.Exists(BindHostFile) {
-		b, err := ioutil.ReadFile(BindHostFile)
+	if tools.Exists(config.BindHostFile) {
+		b, err := ioutil.ReadFile(config.BindHostFile)
 		if err != nil {
 			return err
 		}
-		BindHost = strings.Split(string(b), ",")
+		config.BindHost = strings.Split(string(b), ",")
+		err = InitRule()
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		return fmt.Errorf("bind host file not exist")
 	}
-	return nil
 }
 
 // 附加host
 func InjectHost(instance *belugav1.Beluga) error {
 	hostMap := make(map[string]int)
-	for _, host := range BindHost {
+	for _, host := range config.BindHost {
 		if _, ok := hostMap[host]; !ok {
 			hostMap[host] = 1
 		}

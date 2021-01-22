@@ -13,11 +13,11 @@ import (
 
 // 配置 Deployment
 func (r *BelugaReconciler) reconcileDeployment(instance *belugav1.Beluga) (reconcile.Result, error) {
-	r.Log.Info("Reconciling AvatarAgency Deployment")
+	r.Log.Info("Reconciling Beluga Deployment")
 	var err error
 	// Define a new Deployment object
 	deployment := r.newDeploymentForCR(instance)
-	// Set AvatarAgency instance as the owner and controller
+	// Set Beluga instance as the owner and controller
 	if err = controllerutil.SetControllerReference(instance, deployment, r.Scheme); err != nil {
 		return reconcile.Result{}, err
 	}

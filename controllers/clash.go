@@ -3,14 +3,10 @@ package controllers
 import (
 	"bufio"
 	"fmt"
+	"github.com/morningfish/beluga/api/config"
 	"github.com/morningfish/beluga/tools"
 	"io"
 	"os"
-)
-
-var (
-	RuleFile string
-	Rules    []string
 )
 
 func InitRule() error {
@@ -20,17 +16,17 @@ func InitRule() error {
 	}
 	if rules == nil {
 		for _, host := range BindHost {
-			Rules = append(Rules, fmt.Sprintf("DOMAIN-SUFFIX,%s,Proxy", host))
+			config.Rules = append(config.Rules, fmt.Sprintf("DOMAIN-SUFFIX,%s,Proxy", host))
 		}
 		return nil
 	}
-	Rules = rules
+	config.Rules = rules
 	return nil
 }
 func GetRuleFromFile() ([]string, error) {
 	var newRule []string
-	if tools.Exists(RuleFile) {
-		file, err := os.Open(RuleFile)
+	if tools.Exists(config.RuleFile) {
+		file, err := os.Open(config.RuleFile)
 		if err != nil {
 			return nil, err
 		}

@@ -29,6 +29,7 @@ var (
 }`, SidecarPort, SidecarPassword)
 )
 
+// InjectSidecar: inject sidecar instance
 func InjectSidecar(instance *belugav1.Beluga) error {
 	injectDeployment(instance)
 	injectService(instance)

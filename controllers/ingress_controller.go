@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	belugav1 "github.com/morningfish/beluga/api/v1"
-	networkingv1 "k8s.io/api/networking/v1"
+	networkingv1beta1 "k8s.io/api/networking/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"reflect"
@@ -13,20 +13,20 @@ import (
 
 // 配置 Deployment
 func (r *BelugaReconciler) reconcileIngress(instance *belugav1.Beluga) (reconcile.Result, error) {
-	r.Log.Info("Reconciling AvatarAgency Deployment")
+	r.Log.Info("Reconciling Beluga Deployment")
 	var err error
 	// Define a new Deployment object
 	ingress := newIngressForCR(instance)
 	if ingress == nil {
 		return reconcile.Result{}, nil
 	}
-	// Set AvatarAgency instance as the owner and controller
+	// Set Beluga instance as the owner and controller
 	if err = controllerutil.SetControllerReference(instance, ingress, r.Scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	// Check if this deployment already exists
-	found := &networkingv1.Ingress{}
+	found := &networkingv1beta1.Ingress{}
 	err = r.Get(context.TODO(), types.NamespacedName{Name: ingress.Name, Namespace: ingress.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
 		r.Log.Info("Creating a new deployment", "ingress.Namespace", ingress.Namespace, "ingress.Name", ingress.Name)
@@ -46,11 +46,11 @@ func (r *BelugaReconciler) reconcileIngress(instance *belugav1.Beluga) (reconcil
 
 	return reconcile.Result{}, nil
 }
-func newIngressForCR(instance *belugav1.Beluga) *networkingv1.Ingress {
-	if reflect.DeepEqual(instance.Spec.IngressSpec, networkingv1.IngressSpec{}) {
+func newIngressForCR(instance *belugav1.Beluga) *networkingv1beta1.Ingress {
+	if reflect.DeepEqual(instance.Spec.IngressSpec, networkingv1beta1.IngressSpec{}) {
 		return nil
 	}
-	return &networkingv1.Ingress{
+	return &networkingv1beta1.Ingress{
 		ObjectMeta: instance.ObjectMeta,
 		Spec:       instance.Spec.IngressSpec,
 	}

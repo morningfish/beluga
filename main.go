@@ -18,9 +18,11 @@ package main
 
 import (
 	"flag"
+	"github.com/morningfish/beluga/api/config"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"net/http"
 	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -49,8 +51,9 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
-	flag.StringVar(&controllers.BindHostFile, "bind-host-file", "", "bind host file path, separated by commas")
-	flag.StringVar(&controllers.RuleFile, "rule-file-path", "/rule.rule", "rule file path")
+	flag.StringVar(&config.RuleFile, "rule-file-path", "/rule.rule", "rule file path")
+	flag.StringVar(&config.BindHostFile, "bind-host-file", "", "bind host file path, separated by commas")
+	flag.StringVar(&config.SubServerListenAddress, "server-listen-address", ":8080", "sub server listen address")
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
@@ -59,6 +62,7 @@ func main() {
 		setupLog.Error(err, "get bind host error")
 		os.Exit(1)
 	}
+	StartSubServer()
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
@@ -70,12 +74,12 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-
-	if err = (&controllers.BelugaReconciler{
+	controllers.BelugaReconcile = &controllers.BelugaReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Beluga"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}
+	if err = controllers.BelugaReconcile.SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Beluga")
 		os.Exit(1)
 	}
@@ -86,4 +90,10 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func StartSubServer() {
+	// 监听订阅地址
+	_ = os.Mkdir(config.SubFilePath, 0755)
+	go http.ListenAndServe(config.SubServerListenAddress, http.FileServer(http.Dir(config.SubFilePath)))
 }

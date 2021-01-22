@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,6 +28,8 @@ import (
 
 	belugav1 "github.com/morningfish/beluga/api/v1"
 )
+
+var BelugaReconcile *BelugaReconciler
 
 // BelugaReconciler reconciles a Beluga object
 type BelugaReconciler struct {
@@ -39,6 +42,7 @@ type BelugaReconciler struct {
 // +kubebuilder:rbac:groups=service.beluga.io,resources=belugas/status,verbs=get;update;patch
 
 func (r *BelugaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	var result reconcile.Result
 	_ = context.Background()
 	_ = r.Log.WithValues("beluga", req.NamespacedName)
 	instance := &belugav1.Beluga{}
@@ -58,7 +62,18 @@ func (r *BelugaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-
+	result, err = r.reconcileDeployment(instance)
+	if err != nil {
+		return result, err
+	}
+	result, err = r.reconcileService(instance)
+	if err != nil {
+		return result, err
+	}
+	result, err = r.reconcileIngress(instance)
+	if err != nil {
+		return result, err
+	}
 	return ctrl.Result{}, nil
 }
 

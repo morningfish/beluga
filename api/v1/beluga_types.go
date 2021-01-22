@@ -19,7 +19,7 @@ package v1
 import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	networkingv1 "k8s.io/api/networking/v1"
+	networkingv1beta1 "k8s.io/api/networking/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,13 +34,13 @@ type CallBackHost struct {
 	RewritePath string `json:"rewritePath,omitempty"`
 }
 type BelugaSpec struct {
-	DeploymentSpec appsv1.DeploymentSpec    `json:"deploymentSpec"`
-	ServiceSpec    corev1.ServiceSpec       `json:"serviceSpec,omitempty"`
-	IngressSpec    networkingv1.IngressSpec `json:"ingressSpec,omitempty"`
-	AddBindHost    []string                 `json:"addBindHost,omitempty"`
-	DelBindHost    []string                 `json:"delBindHost,omitempty"`
-	SidecarPort    int32                    `json:"sidecarPort,omitempty"`
-	UniqueName     string                   `json:"uniqueName"`
+	DeploymentSpec appsv1.DeploymentSpec         `json:"deploymentSpec"`
+	ServiceSpec    corev1.ServiceSpec            `json:"serviceSpec,omitempty"`
+	IngressSpec    networkingv1beta1.IngressSpec `json:"ingressSpec,omitempty"`
+	AddBindHost    []string                      `json:"addBindHost,omitempty"`
+	DelBindHost    []string                      `json:"delBindHost,omitempty"`
+	SidecarPort    int32                         `json:"sidecarPort,omitempty"`
+	UniqueName     string                        `json:"uniqueName"`
 }
 
 // BelugaStatus defines the observed state of Beluga
