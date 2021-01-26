@@ -50,6 +50,10 @@ func (r *BelugaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if err != nil {
 		if errors.IsNotFound(err) {
 			r.Log.Info("not exist")
+			err = GenerateSubData()
+			if err != nil {
+				return ctrl.Result{}, err
+			}
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
@@ -73,6 +77,10 @@ func (r *BelugaReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	result, err = r.reconcileIngress(instance)
 	if err != nil {
 		return result, err
+	}
+	err = GenerateSubData()
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
 }
